@@ -1,6 +1,9 @@
 import "CoreLibs/sprites"
+import "CoreLibs/timer"
 
 local gfx <const> = playdate.graphics
+local snd <const> = playdate.sound
+local tmr <const> = playdate.timer
 
 local channelSelection
 local channelImages = {}
@@ -49,6 +52,13 @@ function init()
 		channels[index].sprite:setImage(channelMuteImage)
 		channels[index].sprite:add()
 		channels[index].mute = true
+		channels[index].synth = snd.synth.new()
+		channels[index].synth:setADSR(0.1, 0.1, 1, 0.1)
+		channels[index].synth:setLegato(true)
+		channels[index].pitch = 261.63
+		channels[index].volume = 1
+		channels[index].length = 0.1
+		channels[index].interval = 1000
 	end
 	channels[1].sprite:moveTo(280, 32)
 	channels[2].sprite:moveTo(342, 58)
@@ -62,6 +72,7 @@ end
 
 function playdate.update()
 	gfx.sprite.update()
+	tmr.updateTimers()
 end
 
 function playdate.cranked()
@@ -72,14 +83,21 @@ function playdate.cranked()
 	end
 end
 
+function play(channel)
+	channel.synth:playNote(channel.pitch, channel.volume, channel.length)
+end
+
 function playdate.AButtonDown()
 	channels[currentChannel].mute = not channels[currentChannel].mute
 	if channels[currentChannel].mute then
 		channels[currentChannel].sprite:setImage(channelMuteImage)
 		activeChannels -= 1
+		channels[currentChannel].timer:remove()
+		--channels[currentChannel].synth:stop()
 	else
 		channels[currentChannel].sprite:setImage(channelImage)
 		activeChannels += 1
+		channels[currentChannel].timer = tmr.keyRepeatTimerWithDelay(channels[currentChannel].interval, channels[currentChannel].interval, play, channels[currentChannel])
 	end
 end
 
@@ -88,12 +106,17 @@ function playdate.BButtonDown()
 		for index = 1, 8 do
 			channels[index].mute = true
 			channels[index].sprite:setImage(channelMuteImage)
+			if channels[index].timer then
+				channels[index].timer:remove()
+			end
+			--channels[currentChannel].synth:stop()
 		end
 		activeChannels = 0
 	else
 		for index = 1, 8 do
 			channels[index].mute = false
 			channels[index].sprite:setImage(channelImage)
+			channels[index].timer = tmr.keyRepeatTimerWithDelay(channels[index].interval, channels[index].interval, play, channels[index])
 		end
 		activeChannels = 8
 	end
