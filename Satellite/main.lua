@@ -1,6 +1,7 @@
 import "CoreLibs/sprites"
 import "CoreLibs/timer"
 import "CoreLibs/graphics"
+import "interval"
 
 local gfx <const> = playdate.graphics
 local snd <const> = playdate.sound
@@ -14,10 +15,6 @@ local channelImage
 local channelMuteImage
 local activeChannels = 0
 local font
-local barImage
-local intervalBar
-local intervalImage
-local intervalSprite
 local buttonTimer
 
 function getCurrentChannel()
@@ -79,26 +76,14 @@ function init()
 	font = gfx.font.new("Asheville-Rounded-24-px")
 	gfx.setFont(font)
 	
-	barImage = gfx.image.new("images/bar")
-	intervalBar = gfx.sprite.new()
-	intervalBar:setImage(barImage)
-	intervalBar:setScale(1, channels[currentChannel].interval / 100)
-	intervalBar:setCenter(0, channels[currentChannel].interval / 200)
-	intervalBar:moveTo(30, 210)
-	intervalBar:add()
-	
-	intervalImage = gfx.image.new("images/interval")
-	intervalSprite = gfx.sprite.new()
-	intervalSprite:setImage(intervalImage)
-	intervalSprite:setCenter(0, 1)
-	intervalSprite:moveTo(3, 237)
-	intervalSprite:add()
+	interval.init()
+	interval.show(channels[currentChannel])
 end
 
 function playdate.update()
 	gfx.sprite.update()
 	tmr.updateTimers()
-	gfx.drawTextAligned(channels[currentChannel].interval / 1000 .. "s", 150, 213, kTextAlignment.right)
+	gfx.drawTextAligned(interval.getText(channels[currentChannel]), 150, 213, kTextAlignment.right)
 end
 
 function playdate.cranked()
@@ -106,9 +91,7 @@ function playdate.cranked()
 	if newChannel ~= currentChannel then
 		currentChannel = newChannel
 		channelSelection:setImage(channelImages[currentChannel])
-		intervalBar:setScale(1, channels[currentChannel].interval / 100)
-		intervalBar:setCenter(0, channels[currentChannel].interval / 200)
-		intervalBar:moveTo(30, 210)
+		interval.update(channels[currentChannel])
 	end
 end
 
@@ -151,46 +134,38 @@ function playdate.BButtonDown()
 	end
 end
 
-function intervalUp()
-	if not channels[currentChannel].mute or channels[currentChannel].interval >= 20000 then
-		return
-	end
-	channels[currentChannel].interval += 100
-	intervalBar:setScale(1, channels[currentChannel].interval / 100)
-	intervalBar:setCenter(0, channels[currentChannel].interval / 200)
-	intervalBar:moveTo(30, 210)
+function up()
+	interval.up(channels[currentChannel])
 end
 
-function intervalDown()
-	if not channels[currentChannel].mute or channels[currentChannel].interval <= 100 then
-		return
-	end
-	channels[currentChannel].interval -= 100
-	intervalBar:setScale(1, channels[currentChannel].interval / 100)
-	intervalBar:setCenter(0, channels[currentChannel].interval / 200)
-	intervalBar:moveTo(30, 210)
+function down()
+	interval.down(channels[currentChannel])
 end
 
 function playdate.upButtonDown()
 	if buttonTimer then
 		buttonTimer:remove()
 	end
-	buttonTimer = tmr.keyRepeatTimer(intervalUp)
+	buttonTimer = tmr.keyRepeatTimer(up)
 end
 
 function playdate.downButtonDown()
 	if buttonTimer then
 		buttonTimer:remove()
 	end
-	buttonTimer = tmr.keyRepeatTimer(intervalDown)
+	buttonTimer = tmr.keyRepeatTimer(down)
 end
 
 function playdate.upButtonUp()
-	buttonTimer:remove()
+	if buttonTimer then
+		buttonTimer:remove()
+	end
 end
 
 function playdate.downButtonUp()
-	buttonTimer:remove()
+	if buttonTimer then
+		buttonTimer:remove()
+	end
 end
 
 init()
