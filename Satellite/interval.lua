@@ -18,9 +18,9 @@ function interval.init()
 	bar:setImage(barImage)
 end
 
-function interval.show(channel)
+function interval.show(data)
 	label:add()
-	interval.update(channel)
+	interval.update(data)
 	bar:add()
 end
 
@@ -29,28 +29,28 @@ function interval.hide()
 	bar:remove()
 end
 
-function interval.getText(channel)
-	return channel.interval / 1000 .. "s"
+function interval.getText(data)
+	return data.interval / 1000 .. "s"
 end
 
-function interval.update(channel)
-	bar:setScale(1, channel.interval / 100)
-	bar:setCenter(0, channel.interval / 200)
+function interval.update(data)
+	bar:setScale(1, data.interval / 100)
+	bar:setCenter(0, data.interval / 200)
 	bar:moveTo(30, 210)
 end
 
-function interval.up(channel)
-	if not channel.mute or channel.interval >= 20000 then
+function interval.up(channel, data)
+	if not channel.mute or data.interval >= 20000 then
 		return
 	end
-	channel.interval += 100
-	interval.update(channel)
+	data.interval += 100
+	interval.update(data)
 end
 
-function interval.down(channel)
-	if not channel.mute or channel.interval <= 100 then
+function interval.down(channel, data)
+	if not channel.mute or data.interval <= 100 then
 		return
 	end
-	channel.interval -= 100
-	interval.update(channel)
+	data.interval -= 100
+	interval.update(data)
 end

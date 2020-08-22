@@ -1,6 +1,14 @@
 import "CoreLibs/sprites"
 import "CoreLibs/timer"
 import "CoreLibs/graphics"
+import "waveform"
+import "note"
+import "attack"
+import "decay"
+import "sustain"
+import "release"
+import "volume"
+import "length"
 import "interval"
 
 local gfx <const> = playdate.graphics
@@ -11,11 +19,14 @@ local channelSelection
 local channelImages = {}
 local currentChannel
 local channels = {}
+local channelsData = {}
 local channelImage
 local channelMuteImage
 local activeChannels = 0
 local font
 local buttonTimer
+local valueEditors
+local currentValue = 1
 
 function getCurrentChannel()
 	local crankPosition = playdate.getCrankPosition()
@@ -51,18 +62,30 @@ function init()
 	channelImage = gfx.image.new("images/channel")
 	channelMuteImage = gfx.image.new("images/channelMute")
 	for index = 1, 8 do
+		channelsData[index] = {
+			waveform = snd.kWaveSine,
+			note = 40,
+			pitch = 261.63,
+			attack = 100,
+			decay = 100,
+			sustain = 100,
+			release = 100,
+			volume = 100,
+			length = 100,
+			interval = 1000
+		}
+		
 		channels[index] = {}
 		channels[index].sprite = gfx.sprite.new()
 		channels[index].sprite:setImage(channelMuteImage)
 		channels[index].sprite:add()
 		channels[index].mute = true
-		channels[index].synth = snd.synth.new()
-		channels[index].synth:setADSR(0.1, 0.1, 1, 0.1)
+		channels[index].synth = snd.synth.new(channelsData[index].waveform)
+		channels[index].synth:setADSR(channelsData[index].attack / 1000, channelsData[index].decay / 100, channelsData[index].sustain / 100, channelsData[index].release / 1000)
 		channels[index].synth:setLegato(true)
-		channels[index].pitch = 261.63
-		channels[index].volume = 1
-		channels[index].length = 0.1
-		channels[index].interval = 1000
+		channels[index].pitch = channelsData[index].pitch
+		channels[index].volume = channelsData[index].volume / 100
+		channels[index].length = channelsData[index].length / 1000
 	end
 	channels[1].sprite:moveTo(280, 32)
 	channels[2].sprite:moveTo(342, 58)
@@ -76,14 +99,27 @@ function init()
 	font = gfx.font.new("Asheville-Rounded-24-px")
 	gfx.setFont(font)
 	
-	interval.init()
-	interval.show(channels[currentChannel])
+	valueEditors = {
+		waveform,
+		note,
+		attack,
+		decay,
+		sustain,
+		release,
+		volume,
+		length,
+		interval
+	}
+	for index = 1, table.getsize(valueEditors) do
+		valueEditors[index].init()
+	end
+	valueEditors[currentValue].show(channelsData[currentChannel])
 end
 
 function playdate.update()
 	gfx.sprite.update()
 	tmr.updateTimers()
-	gfx.drawTextAligned(interval.getText(channels[currentChannel]), 150, 213, kTextAlignment.right)
+	gfx.drawTextAligned(valueEditors[currentValue].getText(channelsData[currentChannel]), 150, 213, kTextAlignment.right)
 end
 
 function playdate.cranked()
@@ -91,7 +127,7 @@ function playdate.cranked()
 	if newChannel ~= currentChannel then
 		currentChannel = newChannel
 		channelSelection:setImage(channelImages[currentChannel])
-		interval.update(channels[currentChannel])
+		valueEditors[currentValue].update(channelsData[currentChannel])
 	end
 end
 
@@ -109,7 +145,7 @@ function playdate.AButtonDown()
 	else
 		channels[currentChannel].sprite:setImage(channelImage)
 		activeChannels += 1
-		channels[currentChannel].timer = tmr.keyRepeatTimerWithDelay(channels[currentChannel].interval, channels[currentChannel].interval, play, channels[currentChannel])
+		channels[currentChannel].timer = tmr.keyRepeatTimerWithDelay(channelsData[currentChannel].interval, channelsData[currentChannel].interval, play, channels[currentChannel])
 	end
 end
 
@@ -128,18 +164,18 @@ function playdate.BButtonDown()
 		for index = 1, 8 do
 			channels[index].mute = false
 			channels[index].sprite:setImage(channelImage)
-			channels[index].timer = tmr.keyRepeatTimerWithDelay(channels[index].interval, channels[index].interval, play, channels[index])
+			channels[index].timer = tmr.keyRepeatTimerWithDelay(channelsData[index].interval, channelsData[index].interval, play, channels[index])
 		end
 		activeChannels = 8
 	end
 end
 
 function up()
-	interval.up(channels[currentChannel])
+	valueEditors[currentValue].up(channels[currentChannel], channelsData[currentChannel])
 end
 
 function down()
-	interval.down(channels[currentChannel])
+	valueEditors[currentValue].down(channels[currentChannel], channelsData[currentChannel])
 end
 
 function playdate.upButtonDown()
@@ -166,6 +202,24 @@ function playdate.downButtonUp()
 	if buttonTimer then
 		buttonTimer:remove()
 	end
+end
+
+function playdate.leftButtonDown()
+	valueEditors[currentValue].hide()
+	currentValue -= 1
+	if currentValue < 1 then
+		currentValue = table.getsize(valueEditors)
+	end
+	valueEditors[currentValue].show(channelsData[currentChannel])
+end
+
+function playdate.rightButtonDown()
+	valueEditors[currentValue].hide()
+	currentValue += 1
+	if currentValue > table.getsize(valueEditors) then
+		currentValue = 1
+	end
+	valueEditors[currentValue].show(channelsData[currentChannel])
 end
 
 init()
