@@ -1,6 +1,7 @@
 import "CoreLibs/sprites"
 import "CoreLibs/timer"
 import "CoreLibs/graphics"
+import "CoreLibs/animation"
 import "waveform"
 import "note"
 import "attack"
@@ -27,6 +28,8 @@ local font
 local buttonTimer
 local valueEditors
 local currentValue = 1
+local beatTable
+local testAnimation
 
 function getCurrentChannel()
 	local crankPosition = playdate.getCrankPosition()
@@ -49,8 +52,16 @@ function getCurrentChannel()
 	end
 end
 
+function setChannelPosition(channel, x, y)
+	channel.sprite:moveTo(x, y)
+	channel.ax = x - 32
+	channel.ay = y - 32
+end
+
 function init()
 	gfx.clear()
+	playdate.display.setRefreshRate(40)
+	
 	currentChannel = getCurrentChannel()
 	for index = 1, 8 do
 		channelImages[index] = gfx.image.new("images/channel" .. index)
@@ -59,6 +70,8 @@ function init()
 	channelSelection:setImage(channelImages[currentChannel])
 	channelSelection:moveTo(280, 120)
 	channelSelection:add()
+	
+	beatTable = gfx.imagetable.new("images/beat/beat")	
 	channelImage = gfx.image.new("images/channel")
 	channelMuteImage = gfx.image.new("images/channelMute")
 	for index = 1, 8 do
@@ -74,27 +87,36 @@ function init()
 			length = 100,
 			interval = 1000
 		}
+		local data = channelsData[index]
 		
 		channels[index] = {}
-		channels[index].sprite = gfx.sprite.new()
-		channels[index].sprite:setImage(channelMuteImage)
-		channels[index].sprite:add()
-		channels[index].mute = true
-		channels[index].synth = snd.synth.new(channelsData[index].waveform)
-		channels[index].synth:setADSR(channelsData[index].attack / 1000, channelsData[index].decay / 100, channelsData[index].sustain / 100, channelsData[index].release / 1000)
-		channels[index].synth:setLegato(true)
-		channels[index].pitch = channelsData[index].pitch
-		channels[index].volume = channelsData[index].volume / 100
-		channels[index].length = channelsData[index].length / 1000
+		local channel = channels[index]
+		channel.sprite = gfx.sprite.new()
+		channel.sprite:setImage(channelMuteImage)
+		channel.sprite:add()
+		channel.mute = true
+		channel.synth = snd.synth.new(data.waveform)
+		channel.synth:setADSR(data.attack / 1000, data.decay / 100, data.sustain / 100, data.release / 1000)
+		channel.synth:setLegato(true)
+		channel.pitch = data.pitch
+		channel.volume = data.volume / 100
+		channel.length = data.length / 1000
+		channel.animations = {}
+		for index2 = 1, 6 do
+			channel.animations[index2] = gfx.animation.loop.new(25, beatTable, false)
+			local animation = channel.animations[index2]
+			animation.frame = animation.endFrame
+		end
+		channel.nextAnimation = 1
 	end
-	channels[1].sprite:moveTo(280, 32)
-	channels[2].sprite:moveTo(342, 58)
-	channels[3].sprite:moveTo(368, 120)
-	channels[4].sprite:moveTo(342, 182)
-	channels[5].sprite:moveTo(280, 208)
-	channels[6].sprite:moveTo(218, 182)
-	channels[7].sprite:moveTo(192, 120)
-	channels[8].sprite:moveTo(218, 58)
+	setChannelPosition(channels[1], 280, 32)
+	setChannelPosition(channels[2], 342, 58)
+	setChannelPosition(channels[3], 368, 120)
+	setChannelPosition(channels[4], 342, 182)
+	setChannelPosition(channels[5], 280, 208)
+	setChannelPosition(channels[6], 218, 182)
+	setChannelPosition(channels[7], 192, 120)
+	setChannelPosition(channels[8], 218, 58)
 	
 	font = gfx.font.new("Asheville-Rounded-24-px")
 	gfx.setFont(font)
@@ -120,6 +142,16 @@ function playdate.update()
 	gfx.sprite.update()
 	tmr.updateTimers()
 	gfx.drawTextAligned(valueEditors[currentValue].getText(channelsData[currentChannel]), 150, 213, kTextAlignment.right)
+	--playdate.drawFPS(0, 0)
+	for index = 1, 8 do
+		local channel = channels[index]
+		for index2 = 1, 6 do
+			local animation = channel.animations[index2]
+			if animation.frame < animation.endFrame then
+				animation:draw(channel.ax, channel.ay)
+			end
+		end
+	end
 end
 
 function playdate.cranked()
@@ -133,6 +165,11 @@ end
 
 function play(channel)
 	channel.synth:playNote(channel.pitch, channel.volume, channel.length)
+	channel.animations[channel.nextAnimation].frame = 1
+	channel.nextAnimation += 1
+	if channel.nextAnimation > 6 then
+		channel.nextAnimation = 1
+	end
 end
 
 function playdate.AButtonDown()
