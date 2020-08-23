@@ -20,7 +20,7 @@ local channelSelection
 local channelImages = {}
 local currentChannel
 local channels = {}
-local channelsData = {}
+local channelsData
 local channelImage
 local channelMuteImage
 local activeChannels = 0
@@ -71,24 +71,30 @@ function init()
 	channelSelection:moveTo(280, 120)
 	channelSelection:add()
 	
+	channelsData = playdate.datastore.read()
+	if not channelsData then
+		channelsData = {}
+		for index = 1, 8 do
+			channelsData[index] = {
+				waveform = snd.kWaveSine,
+				note = 40,
+				pitch = 261.63,
+				attack = 100,
+				decay = 100,
+				sustain = 100,
+				release = 100,
+				volume = 100,
+				length = 100,
+				interval = 1000
+			}
+		end
+	end
+	
 	beatTable = gfx.imagetable.new("images/beat/beat")	
 	channelImage = gfx.image.new("images/channel")
 	channelMuteImage = gfx.image.new("images/channelMute")
 	for index = 1, 8 do
-		channelsData[index] = {
-			waveform = snd.kWaveSine,
-			note = 40,
-			pitch = 261.63,
-			attack = 100,
-			decay = 100,
-			sustain = 100,
-			release = 100,
-			volume = 100,
-			length = 100,
-			interval = 1000
-		}
 		local data = channelsData[index]
-		
 		channels[index] = {}
 		local channel = channels[index]
 		channel.sprite = gfx.sprite.new()
@@ -257,6 +263,18 @@ function playdate.rightButtonDown()
 		currentValue = 1
 	end
 	valueEditors[currentValue].show(channelsData[currentChannel])
+end
+
+function save()
+	playdate.datastore.write(channelsData)
+end
+
+function playdate.gameWillTerminate()
+	save()
+end
+
+function playdate.gameWillPause()
+	save()
 end
 
 init()
