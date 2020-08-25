@@ -3,6 +3,12 @@ local snd <const> = playdate.sound
 
 local labelImage
 local label
+local sineImage
+local squareImage
+local sawImage
+local triangleImage
+local noiseImage
+local wave
 
 waveform = {}
 
@@ -11,15 +17,27 @@ function waveform.init()
 	label = gfx.sprite.new()
 	label:setImage(labelImage)
 	label:setCenter(0, 1)
-	label:moveTo(3, 237)
+	label:moveTo(5, 235)
+	sineImage = gfx.image.new("images/sine")
+	squareImage = gfx.image.new("images/square")
+	sawImage = gfx.image.new("images/sawtooth")
+	triangleImage = gfx.image.new("images/triangle")
+	noiseImage = gfx.image.new("images/noise")
+	wave = gfx.sprite.new()
+	wave:setImage(sineImage)
+	wave:setCenter(0, 1)
+	wave:moveTo(34, 206)
 end
 
 function waveform.show(data)
 	label:add()
+	waveform.update(data)
+	wave:add()
 end
 
 function waveform.hide()
 	label:remove()
+	wave:remove()
 end
 
 function waveform.getText(data)
@@ -37,6 +55,17 @@ function waveform.getText(data)
 end
 
 function waveform.update(data)
+	if data.waveform == snd.kWaveSine then
+		wave:setImage(sineImage)
+	elseif data.waveform == snd.kWaveSquare then
+		wave:setImage(squareImage)
+	elseif data.waveform == snd.kWaveSawtooth then
+		wave:setImage(sawImage)
+	elseif data.waveform == snd.kWaveTriangle then
+		wave:setImage(triangleImage)
+	else
+		wave:setImage(noiseImage)
+	end
 end
 
 function waveform.up(channel, data)
@@ -52,6 +81,7 @@ function waveform.up(channel, data)
 		data.waveform = snd.kWaveTriangle
 	end
 	channel.synth:setWaveform(data.waveform)
+	waveform.update(data)
 end
 
 function waveform.down(channel, data)
@@ -67,4 +97,5 @@ function waveform.down(channel, data)
 		data.waveform = snd.kWaveSine
 	end
 	channel.synth:setWaveform(data.waveform)
+	waveform.update(data)
 end

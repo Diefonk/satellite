@@ -147,7 +147,7 @@ end
 function playdate.update()
 	gfx.sprite.update()
 	tmr.updateTimers()
-	gfx.drawTextAligned(valueEditors[currentValue].getText(channelsData[currentChannel]), 150, 213, kTextAlignment.right)
+	gfx.drawTextAligned(valueEditors[currentValue].getText(channelsData[currentChannel]), 154, 211, kTextAlignment.right)
 	--playdate.drawFPS(0, 0)
 	for index = 1, 8 do
 		local channel = channels[index]

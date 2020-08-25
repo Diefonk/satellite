@@ -12,7 +12,7 @@ function length.init()
 	label = gfx.sprite.new()
 	label:setImage(labelImage)
 	label:setCenter(0, 1)
-	label:moveTo(3, 237)
+	label:moveTo(5, 235)
 	barImage = gfx.image.new("images/bar")
 	bar = gfx.sprite.new()
 	bar:setImage(barImage)
@@ -36,7 +36,7 @@ end
 function length.update(data)
 	bar:setScale(1, data.length / 100)
 	bar:setCenter(0, data.length / 200)
-	bar:moveTo(30, 210)
+	bar:moveTo(34, 206)
 end
 
 function length.up(channel, data)

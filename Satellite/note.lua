@@ -19,7 +19,7 @@ function note.init()
 	label = gfx.sprite.new()
 	label:setImage(labelImage)
 	label:setCenter(0, 1)
-	label:moveTo(3, 237)
+	label:moveTo(5, 235)
 end
 
 function note.show(data)
