@@ -4,6 +4,8 @@ local labelImage
 local label
 local barImage
 local bar
+local backgroundImage
+local barBackground
 
 length = {}
 
@@ -11,22 +13,30 @@ function length.init()
 	labelImage = gfx.image.new("images/length")
 	label = gfx.sprite.new()
 	label:setImage(labelImage)
-	label:setCenter(0, 1)
-	label:moveTo(5, 235)
+	label:setCenter(0, 0)
+	label:moveTo(5, 6)
 	barImage = gfx.image.new("images/bar")
 	bar = gfx.sprite.new()
 	bar:setImage(barImage)
+	backgroundImage = gfx.image.new("images/barBackground")
+	barBackground = gfx.sprite.new()
+	barBackground:setImage(backgroundImage)
+	barBackground:setCenter(0, 1)
+	barBackground:moveTo(34, 206)
+	barBackground:setZIndex(-1)
 end
 
 function length.show(data)
 	label:add()
 	length.update(data)
 	bar:add()
+	barBackground:add()
 end
 
 function length.hide()
 	label:remove()
 	bar:remove()
+	barBackground:remove()
 end
 
 function length.getText(data)

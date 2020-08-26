@@ -5,7 +5,7 @@ local labelImage
 local label
 local sineImage
 local squareImage
-local sawImage
+local sawtoothImage
 local triangleImage
 local noiseImage
 local wave
@@ -16,11 +16,11 @@ function waveform.init()
 	labelImage = gfx.image.new("images/waveform")
 	label = gfx.sprite.new()
 	label:setImage(labelImage)
-	label:setCenter(0, 1)
-	label:moveTo(5, 235)
+	label:setCenter(0, 0)
+	label:moveTo(5, 6)
 	sineImage = gfx.image.new("images/sine")
 	squareImage = gfx.image.new("images/square")
-	sawImage = gfx.image.new("images/sawtooth")
+	sawtoothImage = gfx.image.new("images/sawtooth")
 	triangleImage = gfx.image.new("images/triangle")
 	noiseImage = gfx.image.new("images/noise")
 	wave = gfx.sprite.new()
@@ -46,7 +46,7 @@ function waveform.getText(data)
 	elseif data.waveform == snd.kWaveSquare then
 		return "Square"
 	elseif data.waveform == snd.kWaveSawtooth then
-		return "Saw"
+		return "Sawtooth"
 	elseif data.waveform == snd.kWaveTriangle then
 		return "Triangle"
 	else
@@ -60,7 +60,7 @@ function waveform.update(data)
 	elseif data.waveform == snd.kWaveSquare then
 		wave:setImage(squareImage)
 	elseif data.waveform == snd.kWaveSawtooth then
-		wave:setImage(sawImage)
+		wave:setImage(sawtoothImage)
 	elseif data.waveform == snd.kWaveTriangle then
 		wave:setImage(triangleImage)
 	else
