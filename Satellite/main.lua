@@ -8,6 +8,7 @@ import "attack"
 import "decay"
 import "sustain"
 import "release"
+import "bitcrusher"
 import "volume"
 import "length"
 import "interval"
@@ -83,10 +84,16 @@ function init()
 				decay = 100,
 				sustain = 100,
 				release = 100,
+				bitcrusher = 0,
 				volume = 100,
 				length = 100,
 				interval = 1000
 			}
+		end
+	end
+	for index = 1, 8 do
+		if not channelsData[index].bitcrusher then
+			channelsData[index].bitcrusher = 0
 		end
 	end
 	
@@ -101,10 +108,15 @@ function init()
 		channel.sprite:setImage(channelMuteImage)
 		channel.sprite:add()
 		channel.mute = true
+		channel.channel = snd.channel.new()
 		channel.synth = snd.synth.new(data.waveform)
+		channel.channel:addSource(channel.synth)
 		channel.synth:setADSR(data.attack / 1000, data.decay / 100, data.sustain / 100, data.release / 1000)
 		channel.synth:setLegato(true)
 		channel.pitch = data.pitch
+		channel.bitcrusher = snd.bitcrusher.new()
+		channel.channel:addEffect(channel.bitcrusher)
+		channel.bitcrusher:setAmount(data.bitcrusher)
 		channel.volume = data.volume / 100
 		channel.length = data.length / 1000
 		channel.animations = {}
@@ -134,6 +146,7 @@ function init()
 		decay,
 		sustain,
 		release,
+		bitcrusher,
 		volume,
 		length,
 		interval
