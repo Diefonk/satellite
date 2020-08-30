@@ -10,7 +10,7 @@ local barBackground
 bitcrusher = {}
 
 function bitcrusher.init()
-	labelImage = gfx.image.new("images/volume")
+	labelImage = gfx.image.new("images/bitcrusher")
 	label = gfx.sprite.new()
 	label:setImage(labelImage)
 	label:setCenter(0, 0)
@@ -27,14 +27,14 @@ function bitcrusher.init()
 end
 
 function bitcrusher.show(data)
-	--label:add()
+	label:add()
 	bitcrusher.update(data)
 	bar:add()
 	barBackground:add()
 end
 
 function bitcrusher.hide()
-	--label:remove()
+	label:remove()
 	bar:remove()
 	barBackground:remove()
 end
