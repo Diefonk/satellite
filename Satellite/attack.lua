@@ -18,6 +18,8 @@ function attack.init()
 	barImage = gfx.image.new("images/bar")
 	bar = gfx.sprite.new()
 	bar:setImage(barImage)
+	bar:setCenter(0, 1)
+	bar:moveTo(34, 206)
 	backgroundImage = gfx.image.new("images/barBackground")
 	barBackground = gfx.sprite.new()
 	barBackground:setImage(backgroundImage)
@@ -45,8 +47,6 @@ end
 
 function attack.update(data)
 	bar:setScale(1, data.attack / 100)
-	bar:setCenter(0, data.attack / 200)
-	bar:moveTo(34, 206)
 end
 
 function attack.up(channel, data)

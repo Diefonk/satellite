@@ -1,4 +1,4 @@
-Satellite v0.2
+Satellite v0.3
 by Diefonk
 
 Instructions:
