@@ -65,7 +65,6 @@ function editInit()
 	channelSelection = gfx.sprite.new()
 	channelSelection:setImage(channelImages[currentChannel])
 	channelSelection:moveTo(280, 120)
-	channelSelection:add()
 
 	channelsData = playdate.datastore.read()
 	if not channelsData then
@@ -96,7 +95,6 @@ function editInit()
 		local channel = channels[index]
 		channel.sprite = gfx.sprite.new()
 		channel.sprite:setImage(channelMuteImage)
-		channel.sprite:add()
 		channel.mute = true
 		channel.channel = snd.channel.new()
 		channel.synth = snd.synth.new(data.waveform)
@@ -141,7 +139,31 @@ function editInit()
 	for index = 1, table.getsize(valueEditors) do
 		valueEditors[index].init()
 	end
+end
+
+function editEnter(fileName)
+	channelSelection:add()
+	for index = 1, 8 do
+		channels[index].sprite:add()
+	end
 	valueEditors[currentValue].show(channelsData[currentChannel])
+end
+
+function editExit()
+	channelSelection:remove()
+	for index = 1, 8 do
+		channels[index].sprite:remove()
+		channels[index].mute = true
+		channels[index].sprite:setImage(channelMuteImage)
+		if channels[index].timer then
+			channels[index].timer:remove()
+		end
+	end
+	activeChannels = 0
+	valueEditors[currentValue].hide()
+	if buttonTimer then
+		buttonTimer:remove()
+	end
 end
 
 function editUpdate()

@@ -1,18 +1,27 @@
 import "edit"
+import "menu"
 
 local gfx <const> = playdate.graphics
 local tmr <const> = playdate.timer
 
 local MENU <const> = 1
 local EDIT <const> = 2
-local state = EDIT
+local state = MENU
 
 function init()
-	gfx.clear()
 	playdate.display.setRefreshRate(40)
 	gfx.setFont(gfx.font.new("Asheville-Rounded-24-px"))
 
+	playdate.getSystemMenu():addMenuItem("project menu", function()
+		if state == EDIT then
+			editExit()
+		end
+		state = MENU
+		loadFiles()
+	end)
+
 	editInit()
+	loadFiles()
 end
 
 function playdate.update()
@@ -21,6 +30,8 @@ function playdate.update()
 	--playdate.drawFPS(0, 0)
 	if state == EDIT then
 		editUpdate()
+	elseif state == MENU then
+		drawMenu()
 	end
 end
 
@@ -33,6 +44,9 @@ end
 function playdate.AButtonDown()
 	if state == EDIT then
 		editAButtonDown()
+	elseif state == MENU then
+		state = EDIT
+		editEnter(getSelectedFile())
 	end
 end
 
@@ -45,12 +59,16 @@ end
 function playdate.upButtonDown()
 	if state == EDIT then
 		editUpButtonDown()
+	elseif state == MENU then
+		menuUp()
 	end
 end
 
 function playdate.downButtonDown()
 	if state == EDIT then
 		editDownButtonDown()
+	elseif state == MENU then
+		menuDown()
 	end
 end
 
