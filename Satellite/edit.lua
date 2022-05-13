@@ -21,6 +21,7 @@ local channelSelection
 local channelImages = {}
 local currentChannel
 local channels = {}
+local dataName
 local channelsData
 local channelImage
 local channelMuteImage
@@ -66,47 +67,21 @@ function editInit()
 	channelSelection:setImage(channelImages[currentChannel])
 	channelSelection:moveTo(280, 120)
 
-	channelsData = playdate.datastore.read()
-	if not channelsData then
-		channelsData = {}
-		for index = 1, 8 do
-			channelsData[index] = {
-				waveform = snd.kWaveSine,
-				note = 40,
-				pitch = 261.63,
-				attack = 100,
-				decay = 100,
-				sustain = 100,
-				release = 100,
-				bitcrusher = 0,
-				volume = 100,
-				length = 100,
-				interval = 1000
-			}
-		end
-	end
-
 	beatTable = gfx.imagetable.new("images/beat/beat")
 	channelImage = gfx.image.new("images/channel")
 	channelMuteImage = gfx.image.new("images/channelMute")
 	for index = 1, 8 do
-		local data = channelsData[index]
 		channels[index] = {}
 		local channel = channels[index]
 		channel.sprite = gfx.sprite.new()
 		channel.sprite:setImage(channelMuteImage)
 		channel.mute = true
 		channel.channel = snd.channel.new()
-		channel.synth = snd.synth.new(data.waveform)
+		channel.synth = snd.synth.new()
 		channel.channel:addSource(channel.synth)
-		channel.synth:setADSR(data.attack / 1000, data.decay / 100, data.sustain / 100, data.release / 1000)
 		channel.synth:setLegato(true)
-		channel.pitch = data.pitch
 		channel.bitcrusher = snd.bitcrusher.new()
 		channel.channel:addEffect(channel.bitcrusher)
-		channel.bitcrusher:setAmount(data.bitcrusher)
-		channel.volume = data.volume / 100
-		channel.length = data.length / 1000
 		channel.animations = {}
 		for index2 = 1, 6 do
 			channel.animations[index2] = gfx.animation.loop.new(25, beatTable, false)
@@ -142,10 +117,44 @@ function editInit()
 end
 
 function editEnter(fileName)
-	channelSelection:add()
-	for index = 1, 8 do
-		channels[index].sprite:add()
+	dataName = fileName
+	channelsData = playdate.datastore.read(dataName)
+	if not channelsData then
+		channelsData = {}
+		for index = 1, 8 do
+			channelsData[index] = {
+				waveform = snd.kWaveSine,
+				note = 40,
+				pitch = 261.63,
+				attack = 100,
+				decay = 100,
+				sustain = 100,
+				release = 100,
+				bitcrusher = 0,
+				volume = 100,
+				length = 100,
+				interval = 1000
+			}
+		end
 	end
+
+	for index = 1, 8 do
+		local data = channelsData[index]
+		local channel = channels[index]
+		channel.synth:setWaveform(data.waveform)
+		channel.synth:setADSR(data.attack / 1000, data.decay / 100, data.sustain / 100, data.release / 1000)
+		channel.pitch = data.pitch
+		channel.bitcrusher:setAmount(data.bitcrusher)
+		channel.volume = data.volume / 100
+		channel.length = data.length / 1000
+		channel.sprite:add()
+	end
+
+	currentChannel = getCurrentChannel()
+	channelSelection:setImage(channelImages[currentChannel])
+	channelSelection:add()
+
+	currentValue = 1
 	valueEditors[currentValue].show(channelsData[currentChannel])
 end
 
@@ -285,5 +294,5 @@ function editRightButtonDown()
 end
 
 function save()
-	playdate.datastore.write(channelsData)
+	playdate.datastore.write(channelsData, dataName)
 end

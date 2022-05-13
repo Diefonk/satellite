@@ -12,7 +12,7 @@ function init()
 	playdate.display.setRefreshRate(40)
 	gfx.setFont(gfx.font.new("Asheville-Rounded-24-px"))
 
-	playdate.getSystemMenu():addMenuItem("project menu", function()
+	playdate.getSystemMenu():addMenuItem("satellite files", function()
 		if state == EDIT then
 			editExit()
 		end
@@ -97,11 +97,27 @@ function playdate.rightButtonDown()
 end
 
 function playdate.gameWillTerminate()
-	save()
+	if state == EDIT then
+		save()
+	end
 end
 
 function playdate.gameWillPause()
-	save()
+	if state == EDIT then
+		save()
+	end
+end
+
+function playdate.deviceWillSleep()
+	if state == EDIT then
+		save()
+	end
+end
+
+function playdate.deviceWillLock()
+	if state == EDIT then
+		save()
+	end
 end
 
 init()

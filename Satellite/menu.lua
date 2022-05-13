@@ -8,10 +8,7 @@ function loadFiles()
 	local allFiles = playdate.file.listFiles()
 	for index = 1, #allFiles do
 		if allFiles[index]:sub(-#".json") == ".json" then
-			table.insert(files, {
-				name = allFiles[index],
-				menuName = allFiles[index]:sub(1, -1 - #".json")
-			})
+			table.insert(files, allFiles[index]:sub(1, -1 - #".json"))
 		end
 	end
 	return #files
@@ -25,7 +22,7 @@ function drawMenu()
 		if index == selectedFile then
 			gfx.setImageDrawMode(gfx.kDrawModeInverted)
 		end
-		gfx.drawText(files[index].menuName, 5, 108 + 34 * (index - selectedFile))
+		gfx.drawText(files[index], 5, 108 + 34 * (index - selectedFile))
 		gfx.setImageDrawMode(gfx.kDrawModeCopy)
 	end
 end
@@ -47,5 +44,5 @@ function menuDown()
 end
 
 function getSelectedFile()
-	return files[selectedFile].name
+	return files[selectedFile]
 end
