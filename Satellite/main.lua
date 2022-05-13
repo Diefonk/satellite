@@ -1,11 +1,14 @@
 import "edit"
 import "menu"
+import "controls"
 
 local gfx <const> = playdate.graphics
 local tmr <const> = playdate.timer
 
 local MENU <const> = 1
 local EDIT <const> = 2
+local NEW <const> = 3
+local CONTROLS <const> = 4
 local state = MENU
 
 function init()
@@ -20,6 +23,13 @@ function init()
 		loadFiles()
 	end)
 
+	playdate.getSystemMenu():addMenuItem("controls", function()
+		if state == EDIT then
+			editExit()
+		end
+		state = CONTROLS
+	end)
+
 	editInit()
 	loadFiles()
 end
@@ -32,6 +42,8 @@ function playdate.update()
 		editUpdate()
 	elseif state == MENU then
 		drawMenu()
+	elseif state == CONTROLS then
+		drawControls()
 	end
 end
 
