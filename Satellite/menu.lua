@@ -1,7 +1,7 @@
 local gfx <const> = playdate.graphics
 
 local files
-local selectedFile = 1
+local selectedFile
 
 function loadFiles()
 	files = {}
@@ -11,10 +11,10 @@ function loadFiles()
 			table.insert(files, allFiles[index]:sub(1, -1 - #".json"))
 		end
 	end
+	selectedFile = 1
 	return #files
 end
 
-gfx.setColor(gfx.kColorBlack)
 function drawMenu()
 	gfx.clear()
 	gfx.fillRect(0, 103, 400, 34)

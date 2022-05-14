@@ -119,24 +119,6 @@ end
 function editEnter(fileName)
 	dataName = fileName
 	channelsData = playdate.datastore.read(dataName)
-	if not channelsData then
-		channelsData = {}
-		for index = 1, 8 do
-			channelsData[index] = {
-				waveform = snd.kWaveSine,
-				note = 40,
-				pitch = 261.63,
-				attack = 100,
-				decay = 100,
-				sustain = 100,
-				release = 100,
-				bitcrusher = 0,
-				volume = 100,
-				length = 100,
-				interval = 1000
-			}
-		end
-	end
 
 	for index = 1, 8 do
 		local data = channelsData[index]

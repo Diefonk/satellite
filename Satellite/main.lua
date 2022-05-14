@@ -1,6 +1,7 @@
 import "edit"
 import "menu"
 import "controls"
+import "new"
 
 local gfx <const> = playdate.graphics
 local tmr <const> = playdate.timer
@@ -12,26 +13,43 @@ local CONTROLS <const> = 4
 local state = MENU
 
 function init()
+	gfx.setBackgroundColor(gfx.kColorWhite)
+	gfx.setColor(gfx.kColorBlack)
 	playdate.display.setRefreshRate(40)
 	gfx.setFont(gfx.font.new("Asheville-Rounded-24-px"))
 
 	playdate.getSystemMenu():addMenuItem("satellite files", function()
 		if state == EDIT then
 			editExit()
+		elseif state == NEW then
+			newExit()
 		end
 		state = MENU
-		loadFiles()
+		if loadFiles() <= 0 then
+			state = NEW
+		end
+	end)
+
+	playdate.getSystemMenu():addMenuItem("new file", function()
+		if state == EDIT then
+			editExit()
+		end
+		state = NEW
 	end)
 
 	playdate.getSystemMenu():addMenuItem("controls", function()
 		if state == EDIT then
 			editExit()
+		elseif state == NEW then
+			newExit()
 		end
 		state = CONTROLS
 	end)
 
 	editInit()
-	loadFiles()
+	if loadFiles() <= 0 then
+		state = NEW
+	end
 end
 
 function playdate.update()
@@ -44,6 +62,8 @@ function playdate.update()
 		drawMenu()
 	elseif state == CONTROLS then
 		drawControls()
+	elseif state == NEW then
+		newUpdate()
 	end
 end
 
@@ -105,6 +125,18 @@ end
 function playdate.rightButtonDown()
 	if state == EDIT then
 		editRightButtonDown()
+	end
+end
+
+function playdate.keyboard.keyboardWillHideCallback(ok)
+	if ok then
+		state = EDIT
+		editEnter(newCreate())
+	else
+		state = MENU
+		if loadFiles() <= 0 then
+			state = NEW
+		end
 	end
 end
 
