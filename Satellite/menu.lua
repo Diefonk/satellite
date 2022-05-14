@@ -15,16 +15,22 @@ function loadFiles()
 	return #files
 end
 
+local buttonsWidth <const> = gfx.getSystemFont():getTextWidth("ⒶOpen ⒷDelete") + 10
+local buttonsHeight <const> = gfx.getSystemFont():getHeight()
 function drawMenu()
 	gfx.clear()
-	gfx.fillRect(0, 103, 400, 34)
+	gfx.fillRect(0, 68, 400, 34)
 	for index = 1, #files do
 		if index == selectedFile then
 			gfx.setImageDrawMode(gfx.kDrawModeInverted)
 		end
-		gfx.drawText(files[index], 5, 108 + 34 * (index - selectedFile))
+		gfx.drawText(files[index], 5, 73 + 34 * (index - selectedFile))
 		gfx.setImageDrawMode(gfx.kDrawModeCopy)
 	end
+	gfx.fillRect(400 - buttonsWidth, 230 - buttonsHeight, buttonsWidth, buttonsHeight + 10)
+	gfx.setImageDrawMode(gfx.kDrawModeInverted)
+	gfx.getSystemFont():drawTextAligned("ⒶOpen ⒷDelete", 395, 235 - buttonsHeight, kTextAlignment.right)
+	gfx.setImageDrawMode(gfx.kDrawModeCopy)
 end
 
 function menuUp()

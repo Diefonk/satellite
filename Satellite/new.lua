@@ -15,7 +15,7 @@ function newUpdate()
 	if gfx.getFont():getTextWidth(key.text) > 400 - key.width() - 20 then
 		gfx.drawTextAligned(key.text, 400 - key.width() - 10, 128, kTextAlignment.right)
 		gfx.setColor(gfx.kColorWhite)
-		gfx.fillRect(0, 128, 10, 24)
+		gfx.fillRect(0, 120, 10, 40)
 		gfx.setColor(gfx.kColorBlack)
 	else
 		gfx.drawText(key.text, 10, 128)

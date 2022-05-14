@@ -2,6 +2,7 @@ import "edit"
 import "menu"
 import "controls"
 import "new"
+import "delete"
 
 local gfx <const> = playdate.graphics
 local tmr <const> = playdate.timer
@@ -9,7 +10,8 @@ local tmr <const> = playdate.timer
 local MENU <const> = 1
 local EDIT <const> = 2
 local NEW <const> = 3
-local CONTROLS <const> = 4
+local DELETE <const> = 4
+local CONTROLS <const> = 5
 local state = MENU
 
 function init()
@@ -64,6 +66,8 @@ function playdate.update()
 		drawControls()
 	elseif state == NEW then
 		newUpdate()
+	elseif state == DELETE then
+		deleteUpdate()
 	end
 end
 
@@ -79,12 +83,23 @@ function playdate.AButtonDown()
 	elseif state == MENU then
 		state = EDIT
 		editEnter(getSelectedFile())
+	elseif state == DELETE then
+		deleteDelete()
+		state = MENU
+		if loadFiles() <= 0 then
+			state = NEW
+		end
 	end
 end
 
 function playdate.BButtonDown()
 	if state == EDIT then
 		editBButtonDown()
+	elseif state == MENU then
+		state = DELETE
+		deleteEnter(getSelectedFile())
+	elseif state == DELETE then
+		state = MENU
 	end
 end
 
@@ -119,12 +134,16 @@ end
 function playdate.leftButtonDown()
 	if state == EDIT then
 		editLeftButtonDown()
+	elseif state == DELETE then
+		deleteLeft()
 	end
 end
 
 function playdate.rightButtonDown()
 	if state == EDIT then
 		editRightButtonDown()
+	elseif state == DELETE then
+		deleteRight()
 	end
 end
 
