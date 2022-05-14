@@ -50,17 +50,23 @@ function interval.update(data)
 end
 
 function interval.up(channel, data)
-	if not channel.mute or data.interval >= 20000 then
+	if data.interval >= 20000 then
 		return
 	end
 	data.interval += 100
+	if channel.timer then
+		channel.timer.duration = data.interval
+	end
 	interval.update(data)
 end
 
 function interval.down(channel, data)
-	if not channel.mute or data.interval <= 100 then
+	if data.interval <= 100 then
 		return
 	end
 	data.interval -= 100
+	if channel.timer then
+		channel.timer.duration = data.interval
+	end
 	interval.update(data)
 end
