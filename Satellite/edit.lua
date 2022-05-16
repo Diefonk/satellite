@@ -138,6 +138,7 @@ function editEnter(fileName)
 
 	currentValue = 1
 	valueEditors[currentValue].show(channelsData[currentChannel])
+	playdate.setAutoLockDisabled(true)
 end
 
 function editExit()
@@ -155,6 +156,7 @@ function editExit()
 	if buttonTimer then
 		buttonTimer:remove()
 	end
+	playdate.setAutoLockDisabled(false)
 end
 
 function editUpdate()
