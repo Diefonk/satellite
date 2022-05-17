@@ -1,5 +1,6 @@
 name=Satellite
 author=Diefonk
 bundleID=net.diefonk.Satellite
-version=0.3
+version=1.0
+buildNumber=1
 imagePath=cover
