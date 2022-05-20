@@ -9,7 +9,7 @@ function deleteEnter(fileName)
 end
 
 function deleteUpdate()
-	gfx.drawTextInRect("Delete " .. file .. "?", 5, 5, 390, 230, nil, nil, kTextAlignment.center)
+	gfx.drawTextInRect("Delete " .. file .. "?", 5, 5, 390, 230, nil, nil, kTextAlignment.center, gfx.getFont())
 	if yes then
 		gfx.fillRect(100, 196, 80, 34)
 		gfx.setImageDrawMode(gfx.kDrawModeInverted)

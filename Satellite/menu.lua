@@ -20,11 +20,12 @@ local buttonsHeight <const> = gfx.getSystemFont():getHeight()
 function drawMenu()
 	gfx.clear()
 	gfx.fillRect(0, 68, 400, 34)
+	local font = gfx.getFont()
 	for index = 1, #files do
 		if index == selectedFile then
 			gfx.setImageDrawMode(gfx.kDrawModeInverted)
 		end
-		gfx.drawText(files[index], 5, 73 + 34 * (index - selectedFile))
+		font:drawText(files[index], 5, 73 + 34 * (index - selectedFile))
 		gfx.setImageDrawMode(gfx.kDrawModeCopy)
 	end
 	gfx.fillRect(400 - buttonsWidth, 230 - buttonsHeight, buttonsWidth, buttonsHeight + 10)

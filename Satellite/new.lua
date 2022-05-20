@@ -12,13 +12,14 @@ function newUpdate()
 		key.show()
 	end
 	gfx.drawText("New file", 5, 93)
+	local font = gfx.getFont()
 	if gfx.getFont():getTextWidth(key.text) > 400 - key.width() - 20 then
-		gfx.drawTextAligned(key.text, 400 - key.width() - 10, 128, kTextAlignment.right)
+		font:drawTextAligned(key.text, 400 - key.width() - 10, 128, kTextAlignment.right)
 		gfx.setColor(gfx.kColorWhite)
 		gfx.fillRect(0, 120, 10, 40)
 		gfx.setColor(gfx.kColorBlack)
 	else
-		gfx.drawText(key.text, 10, 128)
+		font:drawText(key.text, 10, 128)
 	end
 	gfx.drawRect(5, 123, 400 - key.width() - 10, 34)
 end
@@ -40,6 +41,18 @@ function newCreate()
 			interval = 1000
 		}
 	end
-	playdate.datastore.write(channelsData, key.text)
-	return key.text
+	local fileName = key.text
+	fileName = fileName:gsub("%.", "-")
+	fileName = fileName:gsub(":", "-")
+	fileName = fileName:gsub("<", "-")
+	fileName = fileName:gsub(">", "-")
+	fileName = fileName:gsub("?", "-")
+	fileName = fileName:gsub("\"", "-")
+	fileName = fileName:gsub("*", "-")
+	fileName = fileName:gsub("/", "-")
+	fileName = fileName:gsub("|", "-")
+	fileName = fileName:gsub("\\", "-")
+	fileName = fileName:gsub(" ", "_")
+	playdate.datastore.write(channelsData, fileName)
+	return fileName
 end
